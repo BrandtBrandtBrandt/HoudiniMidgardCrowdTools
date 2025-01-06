@@ -1,0 +1,9 @@
+mssMantra = "/mnt/SPYCER-320TB/Software_Comp/Houdini/material_style_sheets/mss_midgaard_mantra_v1_8.json"
+objlist = hou.selectedNodes()
+
+for node in objlist:
+    
+    ## Material Style Sheets
+    #node.parm("RS_apply_stylesheets").set("/mnt/SPYCER-320TB/Software_Comp/Houdini/material_style_sheets/mss_midgaard.json")
+    node.parm("apply_stylesheets").set(mssMantra)
+    node.parm("declare_all_shops").set("all")

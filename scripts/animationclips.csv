@@ -1,0 +1,9 @@
+type,label,path
+male,walk,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/male/walk.fbx
+male,jog,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/male/jog.fbx
+male,idle_stand_01,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/male/idle.fbx
+female,walk,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/female/Standard_Walk.fbx
+male,idle_stand_02,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/male/idle.fbx
+female,jog,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/female/jog.fbx
+female,idle_stand_01,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/female/Standing_Idle.fbx
+female,idle_stand_02,/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/mixamo/source/animationclips/female/Idle_02.fbx

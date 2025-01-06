@@ -1,0 +1,149 @@
+import hou
+import csv
+
+node = hou.pwd()
+#geo = node.geometry()
+
+animClipDir = "/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/animationclips.csv"
+agentCacheDir = '/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/agentCache/'
+
+
+def setupAnimationClips(type, label, path, destroy):
+
+    obj = hou.node("/obj")
+    geoNode = obj.createNode("geo","Agent_Setup_" +label)
+    agentNode = geoNode.createNode("agent", label)
+    agentCacheNode = geoNode.createNode("agentdefinitioncache", "Cache")
+    defNullNode = geoNode.createNode("null", "Agent_Definition")
+    i = 0
+    
+    if type == "girl":
+        type = "female"
+    if type == "boy":
+        type = "male"
+    
+    with open(animClipDir) as csvfile:
+        reader = csv.reader(csvfile)
+        header = next(reader)
+        #map header titles to their index
+        header = {name: index for (index, name) in enumerate(header)}
+        
+        for row in reader:  
+        
+            #i = reader.line_num
+            #i = int(0)
+            
+            animType = row[header['type']]
+            animLabel = row[header['label']]
+            animPath = row[header['path']]
+            
+            #curLine = reader.line_num()
+            
+            if type == animType:
+            
+                #create nodes
+                clipNode = geoNode.createNode("agentclip::2.0", "clip01")
+                agentAnimNode = geoNode.createNode("agent", animLabel)
+                animUnpackNode = geoNode.createNode("kinefx::agentanimationunpack", "unpack_anim")
+                
+                #connect nodes
+                clipNode.setInput(1, animUnpackNode, 0)
+                animUnpackNode.setInput(0, agentAnimNode, 0)
+                defNullNode.setInput(0, clipNode, 0)
+                agentCacheNode.setInput(0, defNullNode, 0)
+                
+                if i == 0:
+                    clipNode.setInput(0, agentNode, 0)
+
+                if i > 0:
+                    clipNode.setInput(0, prevCN, 0)
+                    
+                prevCN = clipNode
+                prevAnim = agentAnimNode
+                i += 1
+                
+                #set parameters
+                
+                #agent node (move outside loop?)
+                agentNode.parm("agentname").set(label)
+                agentNode.parm("input").set("fbx")
+                agentNode.parm("fbxfile").set(path)
+                agentNode.parm("fbxclipname").set("rest")     
+                agentNode.parm("inplace").set(1)
+                agentNode.parm("importmaterials").set(1)
+                
+                
+                if type == "male":
+                    agentNode.parm("fbxlocomotionnode").set("mixamorig_Hips")
+                    agentNode.parm("fbxlocomotionlookat").set("mixamorig_Hips")
+                    
+                if type == "female":
+                    agentNode.parm("fbxlocomotionnode").set("mixamorig2_Hips")
+                    agentNode.parm("fbxlocomotionlookat").set("mixamorig2_Hips")                   
+                    
+                #agent animation nodes
+                agentAnimNode.parm("input").set("fbx")
+                agentAnimNode.parm("fbxfile").set(animPath)
+                agentAnimNode.parm("inplace").set(1)
+                agentAnimNode.parm("currentclip").set("mixamo.com")
+                
+                if type == "male":
+                    agentAnimNode.parm("fbxlocomotionnode").set("mixamorig_Hips")
+                    agentAnimNode.parm("fbxlocomotionlookat").set("mixamorig_Hips")
+                if type == "female":
+                    agentAnimNode.parm("fbxlocomotionnode").set("mixamorig2_Hips")
+                    agentAnimNode.parm("fbxlocomotionlookat").set("mixamorig2_Hips")                     
+                
+                #anim unpack nodes
+                animUnpackNode.parm("output").set("motionclip")
+                    
+                #clip nodes
+                clipNode.parm("source1").set("sop")
+                clipNode.parm("name1").set(animLabel)
+                
+            #cache node (move outside loop)
+            agentCacheNode.parm("agentname").set(label)
+            agentCacheDirAgent = agentCacheDir + label
+            agentCacheNode.parm("cachedir").set(agentCacheDirAgent)
+            agentCacheNode.parm("execute").pressButton()
+                
+                            
+    
+    #display flag
+    #agentsNode.setDisplayFlag(1)
+    #outNode.setRenderFlag(1)
+    
+    #layout nodes
+    geoNode.layoutChildren()
+    print(label + "_Successfully_Created")
+    if destroy == 1:
+        geoNode.destroy()
+        
+#####################    
+#### Load Agents ####
+ctrlclick = kwargs['ctrlclick']
+agentsDir = "/mnt/SPYCER-320TB/Software_Comp/Houdini/crowd/agents.csv"
+
+if ctrlclick:
+    destroy = 0
+else:
+    destroy = 1
+
+def loadCrowdAgents():
+
+    with open(agentsDir) as csvfile:
+        reader = csv.reader(csvfile)
+        header = next(reader)
+        #map header titles to their index
+        header = {name: index for (index, name) in enumerate(header)}
+        
+        for row in reader:  
+                   
+            type = row[header['type']]
+            label = row[header['label']]
+            path = row[header['path']]
+            
+            setupAnimationClips(type,label,path,destroy)
+#RUN FUNCTIONS           
+loadCrowdAgents()
+   

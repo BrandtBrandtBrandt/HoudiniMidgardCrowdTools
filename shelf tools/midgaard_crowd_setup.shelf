@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <tool name="midgaard_crowd_setup" label="MidgÃ¥rd Crowd Setup" icon="CROWDS_populate">
+    <script scriptType="python"><![CDATA[def midgaardSetup():
+
+    obj = hou.node("/obj")
+    mat = hou.node("/mat")
+    out = hou.node("/out")
+    
+    mssMantra = "/mnt/SPYCER-320TB/Software_Comp/Houdini/material_style_sheets/mss_midgaard_mantra_v1_9.json"
+    
+    geoNode = obj.createNode("geo","Midgard_Crowd_Setup")
+    
+    agentsNode = geoNode.createNode("Shortcut::SCCrowdAgents::1.9", "Agents")
+    prepNode = geoNode.createNode("SC_crowd_prep::1.3", "Crowd_Prep")
+    paintCrowdNode = geoNode.createNode("Shortcut::SCCrowdPaint::1.7", "Crowd_Paint")
+    crowdSourceNode = geoNode.createNode("Shortcut::SCCrowdSource::1.3", "Crowd_Source")
+    paintStatesNode = geoNode.createNode("Shortcut::SCCrowdPaintStates::1.0", "Paint_States")
+    crowdSimNode = geoNode.createNode("Shortcut::SCCrowdSim::1.4", "Crowd_Sim")
+    outNode = geoNode.createNode("null", "OUT_Midgard_Crowd")
+    groundNode = geoNode.createNode("grid", "Ground")
+    
+    #cvex
+    #cvexNode = mat.createNode("midgaard_cvex::1.0", "midgaard_cvex")
+    
+    #mantra ROP
+    #mantraRopNode = out.createNode("ifd", "Midgaard_Mantra")
+    
+    #Connect nodes
+    prepNode.setInput(0, agentsNode, 0)
+    prepNode.setInput(2, groundNode, 0)
+    
+    paintCrowdNode.setInput(0, prepNode, 2)
+    
+    crowdSourceNode.setInput(0, prepNode, 0)
+    crowdSourceNode.setInput(1, prepNode, 1)
+    crowdSourceNode.setInput(2, paintCrowdNode, 0)
+    
+    paintStatesNode.setInput(0, crowdSourceNode, 2)
+    
+    crowdSimNode.setInput(0, crowdSourceNode, 0)
+    crowdSimNode.setInput(1, crowdSourceNode, 1)
+    crowdSimNode.setInput(2, paintStatesNode, 0)
+    
+    outNode.setInput(0, crowdSimNode, 0)
+    
+    #set parameters
+    #geoNode.parm("RS_objprop_inst_PackedPrimInstancing").set("1")
+    geoNode.parm("vm_renderpoints").set(0)
+    ## sÃ¦t i stedet Geo Time Samples til 2 pÃ¥ mantra rop
+    #geoNode.parm("geo_velocityblur").set("on")
+    #mantra
+    #mantraRopNode.parm("apply_stylesheets").set(mssMantra)
+    #Should the following be "off" or "all"? Den skal stÃ¥ pÃ¥ all!
+    #mantraRopNode.parm("declare_all_shops").set("all")
+    
+    
+    #display flag
+    agentsNode.setDisplayFlag(1)
+    #outNode.setRenderFlag(1)
+    
+    #layout nodes
+    geoNode.layoutChildren()
+    
+    
+    #print
+    print("Midgard_Crowd_Setup_successfully_Created")
+    
+midgaardSetup()]]></script>
+  </tool>
+</shelfDocument>

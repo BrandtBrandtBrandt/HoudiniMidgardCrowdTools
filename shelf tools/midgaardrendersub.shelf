@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <tool name="midgaardrendsub" label="MidgÃ¥rd Render Submitter" icon="SHELF_bake_character">
+    <script scriptType="python"><![CDATA[out = hou.node('/out')
+
+mssMantra = "/mnt/SPYCER-320TB/Software_Comp/Houdini/material_style_sheets/mss_midgaard_mantra_v1_9.json"
+ifdpath = '$HIP/ifd/$OS/$HIPNAME/$HIPNAME`"_"`$OS.$F4.ifd'
+renderpath = '$HIP/render/$OS/$HIPNAME/$HIPNAME`"_"`$OS.$F4.exr'
+
+ctrlclick = kwargs['ctrlclick']
+
+## create nodes
+rop_node = out.createNode('ifd', 'Beauty')
+rop_node.setColor(hou.Color((1,0.9,0.9)))
+
+submit_node = out.createNode('deadline', 'deadline_RS_submit')    
+    
+
+## set parameters Mantra Rop
+
+## Material Style Sheets
+rop_node.parm("apply_stylesheets").set(mssMantra)
+rop_node.parm("declare_all_shops").set("all")
+
+## extra settings ##
+rop_node.parm("vm_picture").set(renderpath)
+rop_node.parm("trange").set("normal")
+rop_node.parm("vm_renderengine").set("pbrraytrace")
+rop_node.parm("allowmotionblur").set(1)
+rop_node.parm("geo_motionsamples").set(2)
+
+rop_node.parm("vm_samplesx").set(7)
+rop_node.parm("vm_samplesy").set(7)
+
+rop_node.parm("vm_quickplane_all_comp").set(1)
+
+rop_node.parm("soho_outputmode").set(1)
+rop_node.parm("soho_diskfile").set(ifdpath)
+
+##Set parameters on Deadline Submitter
+
+submit_node.parm('take').set('`chs("../" + opinput(".", 0) + "/take")`')
+submit_node.parm('trange').setExpression('ch("../" + opinput(".", 0) + "/trange")')
+submit_node.parm('f1').deleteAllKeyframes()
+submit_node.parm('f2').deleteAllKeyframes()
+submit_node.parm('f3').deleteAllKeyframes()
+submit_node.parm('f1').setExpression('ch("../" + opinput(".", 0) + "/f1")')
+submit_node.parm('f2').setExpression('ch("../" + opinput(".", 0) + "/f2")')
+submit_node.parm('f3').setExpression('ch("../" + opinput(".", 0) + "/f3")')
+submit_node.parm('dl_job_name').setExpression('$HIPNAME + "_" + opinput(".",0)')
+submit_node.parm('dl_mantra_job').set(1)
+submit_node.parm('dl_limit_frames_to_node').set(1)
+submit_node.parm('dl_group').set("gpu")
+submit_node.parm('dl_mantra_group').set("gpu")
+
+submit_node.setInput(0, rop_node, 0)
+submit_node.setColor( hou.Color( (0.8, 0.5, 0.3) ) )
+
+rop_node.moveToGoodPosition()
+submit_node.moveToGoodPosition()]]></script>
+  </tool>
+</shelfDocument>

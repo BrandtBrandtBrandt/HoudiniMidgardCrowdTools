@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <tool name="midgardRopParms" label="Add Midgard ROP Parms" icon="SHELF_bake_character">
+    <script scriptType="python"><![CDATA[mssMantra = "/mnt/SPYCER-320TB/Software_Comp/Houdini/material_style_sheets/mss_midgaard_mantra_v1_9.json"
+objlist = hou.selectedNodes()
+
+for node in objlist:
+    
+    ## Material Style Sheets
+    #node.parm("RS_apply_stylesheets").set("/mnt/SPYCER-320TB/Software_Comp/Houdini/material_style_sheets/mss_midgaard.json")
+    node.parm("apply_stylesheets").set(mssMantra)
+    node.parm("declare_all_shops").set("all")
+    
+    ## extra settings ##
+    node.parm("vm_renderengine").set("pbrraytrace")
+    node.parm("allowmotionblur").set(1)
+    node.parm("geo_motionsamples").set(2)
+    
+    node.parm("vm_samplesx").set(7)
+    node.parm("vm_samplesy").set(7)
+    
+    ]]></script>
+  </tool>
+</shelfDocument>
